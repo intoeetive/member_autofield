@@ -184,7 +184,6 @@ class Member_autofield_ext {
     function membership_id($member_id)
     {
         //member_id-sex-yearmonth
-        $val = $member_id;
         
         $q = $this->EE->db->select('m_field_id_3, join_date')
                 ->from('members')
@@ -194,19 +193,27 @@ class Member_autofield_ext {
         if ($q->num_rows()==0) return '';
         
         $sex = ($q->row('m_field_id_3')!='')?$q->row('m_field_id_3'):'n';
-        $val .= '-'.$sex.'-';
         
         if ($this->EE->config->item('app_version')>=260)
         {
-        	$date = $this->EE->localize->format_date('%Y%m', $q->row('join_date'));
+        	$y = $this->EE->localize->format_date('%Y', $q->row('join_date'));
         }
         else
         {
-        	$date = $this->EE->localize->decode_date('%Y%m', $q->row('join_date'));
+        	$y = $this->EE->localize->decode_date('%Y', $q->row('join_date'));
         }
         
+        if ($this->EE->config->item('app_version')>=260)
+        {
+        	$m = $this->EE->localize->format_date('%m', $q->row('join_date'));
+        }
+        else
+        {
+        	$m = $this->EE->localize->decode_date('%m', $q->row('join_date'));
+        }
         
-        $val .= $date;
+        $val = $y.'/'.$m.'/'.$sex.'/'.$member_id;
+        
         
         return $val;
         
